@@ -1,12 +1,12 @@
-import express, { json, Router } from 'express';
+import express from "express";
+import router from "./auth/auth.routes";
 
 const app = express();
 
-//medlliwares
-app.use(json());
-app.use(Router);
+//middlewares
+app.use(router);
 
 //listen
 app.listen(3000, () => {
-    console.log("Server Running on port 3000. http://localhost:3000")
+  console.log("Server Running on port 3000. http://localhost:3000");
 });
