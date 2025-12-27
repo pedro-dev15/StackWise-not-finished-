@@ -1,100 +1,100 @@
 import request from "supertest";
-import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { verifyToken } from "../infra/token/jwt.token";
 
-import { registerUseCase } from "../usecases/register.usecase";
-import { loginUseCase } from "../usecases/login.usecase";
-
-vi.mock("../usecases/register.usecase", () => ({
-  registerUseCase: vi.fn(),
+// mocks
+vi.mock("../infra/token/jwt.token", () => ({
+  verifyToken: vi.fn(),
 }));
 
-vi.mock("../usecases/login.usecase", () => ({
-  loginUseCase: vi.fn(),
+const prismaMock = {
+  user: {
+    findUnique: vi.fn(),
+  },
+};
+
+vi.mock("../lib/prisma", () => ({
+  prisma: prismaMock,
 }));
 
-const registerUseCaseMock = registerUseCase as unknown as Mock;
-const loginUseCaseMock = loginUseCase as unknown as Mock;
+const getApp = async () => {
+  const mod = await import("../server");
+  return mod.app;
+};
 
 describe("Auth API", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.NODE_ENV = "test";
-    process.env.SECRET = "test-secret";
-    process.env.DATABASE_URL = "postgresql://test:test@localhost:5432/test";
   });
-
-  const getApp = async () => {
-    const mod = await import("../server.js");
-    return mod.app;
-  };
 
   it("GET / should return health check", async () => {
     const app = await getApp();
-
     const res = await request(app).get("/");
 
     expect(res.status).toBe(200);
-    expect(res.text).toContain("api is running");
+    expect(res.text).toContain("Hello, the api is running!");
   });
 
-  it("POST /register should return success message", async () => {
+  it("GET /profile should return 401 if token is missing", async () => {
     const app = await getApp();
 
-    registerUseCaseMock.mockResolvedValueOnce({ id: 1 });
+    const res = await request(app).get("/profile");
 
-    const res = await request(app).post("/register").send({
-      name: "Test User",
-      email: "user@test.com",
-      password: "123456",
-    });
-
-    expect(res.status).toBe(201);
+    expect(res.status).toBe(401);
     expect(res.body).toMatchObject({
-      message: "Usuário criado com sucesso!",
-      userId: 1,
+      error: "Token não fornecido",
     });
   });
 
-  it("POST /register should return 400 on failure", async () => {
+  it("GET /profile should return 401 if token is invalid", async () => {
     const app = await getApp();
+    (verifyToken as any).mockReturnValue(null);
 
-    registerUseCaseMock.mockRejectedValueOnce(new Error("db error"));
-
-    const res = await request(app).post("/register").send({
-      name: "Test User",
-      email: "user@test.com",
-      password: "123456",
-    });
-
-    expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty("error");
-  });
-
-  it("POST /login should return token", async () => {
-    const app = await getApp();
-
-    loginUseCaseMock.mockResolvedValueOnce("token-123");
-
-    const res = await request(app).post("/login").send({
-      email: "user@test.com",
-      password: "123456",
-    });
-
-    expect(res.status).toBe(200);
-    expect(res.body).toMatchObject({ token: "token-123" });
-  });
-
-  it("POST /login should return 401 on failure", async () => {
-    const app = await getApp();
-
-    loginUseCaseMock.mockRejectedValueOnce(new Error("invalid credentials"));
-
-    const res = await request(app).post("/login").send({
-      email: "user@test.com",
-      password: "wrong",
-    });
+    const res = await request(app)
+      .get("/profile")
+      .set("Authorization", "Bearer invalid-token");
 
     expect(res.status).toBe(401);
     expect(res.body).toHaveProperty("message");
+  });
+
+  it("GET /profile should return 401 if user is not found", async () => {
+    const app = await getApp();
+    (verifyToken as any).mockReturnValue("user@email.com");
+    prismaMock.user.findUnique.mockResolvedValue(null);
+
+    const res = await request(app)
+      .get("/profile")
+      .set("Authorization", "Bearer valid-token");
+
+    expect(res.status).toBe(401);
+    expect(res.body).toHaveProperty("message");
+  });
+
+  it("GET /profile should return user profile when authenticated", async () => {
+    const app = await getApp();
+
+    (verifyToken as any).mockReturnValue("user@email.com");
+    prismaMock.user.findUnique.mockResolvedValue({
+      id: 1,
+      email: "user@email.com",
+      name: "Test User",
+      createdAt: new Date(),
+    });
+
+    const res = await request(app)
+      .get("/profile")
+      .set("Authorization", "Bearer valid-token");
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({
+      message: "Perfil do usuário",
+      user: {
+        id: 1,
+        email: "user@email.com",
+        name: "Test User",
+      },
+    });
   });
 });

@@ -34,3 +34,20 @@ export const login: RequestHandler = async (req, res) => {
     res.status(401).json({ message: "Failed login" });
   }
 };
+
+export const profile: RequestHandler = async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    return res.status(401).json({ error: "NÃ£o autorizado" });
+  }
+
+  res.status(200).json({
+    message: "Perfil do usuário",
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      createdAt: user.createdAt,
+    },
+  });
+};
