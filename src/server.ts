@@ -1,9 +1,11 @@
+import "dotenv/config";
 import express from "express";
 import router from "./auth/auth.routes";
 
-const app = express();
+export const app = express();
 
 //middlewares
+app.use(express.json());
 app.use(router);
 
 //listen

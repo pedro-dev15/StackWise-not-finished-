@@ -1,12 +1,12 @@
 import jwt from "jsonwebtoken";
-import { RegisterRequest } from "../../types/auth";
+import { LoginRequest } from "../../types/auth";
 import "dotenv/config";
 
 const SECRET = process.env.SECRET as string;
 
 //Generate a JWT token
-export function generateToken(req: RegisterRequest): string {
-  const token = jwt.sign({ email: req.email }, SECRET, { expiresIn: "1h" });
+export function generateToken(email: string): string {
+  const token = jwt.sign({ email: email }, SECRET, { expiresIn: "1h" });
   return token;
 }
 
