@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import { registerUseCase } from "../usecases/register.usecase";
-import { loginUseCase } from "../usecases/login.usecase";
+import { LoginUseCase } from "../usecases/login.usecase";
+import { RefreshTokenUseCase } from "../usecases/refresh-token.usecase";
 
 export const none: RequestHandler = (req, res) => {
   res.send("Hello, the api is running!");
@@ -24,14 +25,15 @@ export const register: RequestHandler = async (req, res) => {
 
 export const login: RequestHandler = async (req, res) => {
   try {
-    const body = req.body;
+    const { email, password } = req.body;
 
-    const token = await loginUseCase(body);
+    const useCase = new LoginUseCase();
+    const tokens = await useCase.execute(email, password);
 
-    res.status(200).json({ token: token });
-  } catch {
+    res.status(200).json({ tokens: tokens });
+  } catch (err) {
     console.log("Erro ao fazer login");
-    res.status(401).json({ message: "Failed login" });
+    res.status(401).json({ message: "Failed login", err });
   }
 };
 
@@ -50,4 +52,20 @@ export const profile: RequestHandler = async (req, res) => {
       createdAt: user.createdAt,
     },
   });
+};
+
+export const refresh: RequestHandler = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      throw new Error("Refresh token não existe");
+    }
+
+    const useCase = new RefreshTokenUseCase();
+    const tokens = await useCase.execute(refreshToken);
+
+    res.status(200).json(tokens);
+  } catch (err) {
+    res.status(401).json({ error: err });
+  }
 };

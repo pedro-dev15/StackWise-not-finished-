@@ -1,7 +1,6 @@
 import { RequestHandler } from "express";
-import { verifyToken } from "../infra/token/jwt.token";
+import { verifyAcessToken } from "../infra/token/auth.token";
 import { prisma } from "../lib/prisma";
-import { emitWarning } from "node:process";
 
 export const authMiddleware: RequestHandler = async (req, res, next) => {
   const header = req.headers["authorization"];
@@ -18,14 +17,14 @@ export const authMiddleware: RequestHandler = async (req, res, next) => {
   const token = parts[1];
 
   try {
-    const decoded = verifyToken(token);
+    const decoded = verifyAcessToken(token);
     if (!decoded) {
       return res.status(401).json({ message: "Token expirado ou inválido" });
     }
 
     const user = await prisma.user.findUnique({
       where: {
-        email: decoded,
+        id: decoded.sub,
       },
       select: {
         id: true,

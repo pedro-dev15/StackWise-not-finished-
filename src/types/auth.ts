@@ -11,7 +11,7 @@ export interface RegisterRequest {
 
 // User data without password (for API responses and req.user)
 export interface UserWithoutPassword {
-  id: number;
+  id: string;
   email: string;
   name: string;
   createdAt: Date;

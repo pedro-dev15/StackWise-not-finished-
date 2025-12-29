@@ -1,6 +1,6 @@
 import request from "supertest";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { verifyToken } from "../infra/token/jwt.token";
+import { verifyToken } from "../infra/token/auth.token";
 
 // mocks
 vi.mock("../infra/token/jwt.token", () => ({

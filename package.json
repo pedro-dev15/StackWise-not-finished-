@@ -6,9 +6,9 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "npx tsx --watch ./src/server.ts",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "npx prisma migrate dev --name init",
-    "prisma:studio": "prisma studio",
+    "generate": "prisma generate",
+    "migrate": "npx prisma migrate dev --name init",
+    "studio": "prisma studio",
     "test": "vitest",
     "test:watch": "vitest --watch",
     "test:run": "vitest run",
