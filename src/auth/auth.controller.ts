@@ -30,7 +30,13 @@ export const login: RequestHandler = async (req, res) => {
     const useCase = new LoginUseCase();
     const tokens = await useCase.execute(email, password);
 
-    res.status(200).json({ tokens: tokens });
+    res
+      .cookie("refreshToken", tokens.refreshToken, {
+        httpOnly: true,
+        path: "/",
+      })
+      .status(200)
+      .json({ AccessToken: tokens.accessToken });
   } catch (err) {
     console.log("Erro ao fazer login");
     res.status(401).json({ message: "Failed login", err });
@@ -56,16 +62,24 @@ export const profile: RequestHandler = async (req, res) => {
 
 export const refresh: RequestHandler = async (req, res) => {
   try {
-    const { refreshToken } = req.body;
+    const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
-      throw new Error("Refresh token não existe");
+      return res.status(401).json({ error: "Refresh token ausente" });
     }
 
     const useCase = new RefreshTokenUseCase();
     const tokens = await useCase.execute(refreshToken);
 
-    res.status(200).json(tokens);
+    res
+      .cookie("refreshToken", tokens.newRefreshToken, {
+        httpOnly: true,
+        path: "/",
+        sameSite: "strict",
+        secure: process.env.NODE_ENV === "production",
+      })
+      .status(201)
+      .json({ accessToken: tokens.newAccessToken });
   } catch (err) {
-    res.status(401).json({ error: err });
+    res.status(401).json({ error: "Refresh token inválido", err });
   }
 };

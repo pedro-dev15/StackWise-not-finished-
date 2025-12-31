@@ -24,14 +24,23 @@ export class LoginUseCase {
 
     const accessToken = generateAcessToken(user.id);
 
-    const refreshToken = generateRefreshToken(user.id);
-    const refreshTokenHash = getHash(refreshToken);
-
-    await prisma.refreshToken.create({
+    const temp = await prisma.refreshToken.create({
       data: {
-        tokenHash: await refreshTokenHash,
+        tokenHash: "temp",
         userId: user.id,
-        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+      },
+    });
+
+    const refreshToken = generateRefreshToken(temp.id);
+    const refreshTokenHash = await getHash(refreshToken);
+
+    await prisma.refreshToken.update({
+      where: {
+        id: temp.id,
+      },
+      data: {
+        tokenHash: refreshTokenHash,
       },
     });
 
