@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { registerUseCase } from "../usecases/register.usecase";
+import { RegisterUseCase } from "../usecases/register.usecase";
 import { LoginUseCase } from "../usecases/login.usecase";
 import { RefreshTokenUseCase } from "../usecases/refresh-token.usecase";
 
@@ -11,7 +11,8 @@ export const register: RequestHandler = async (req, res) => {
   try {
     const body = req.body;
 
-    const user = await registerUseCase(body);
+    const useCase = new RegisterUseCase();
+    const user = await useCase.execute(body);
 
     res.status(201).json({
       message: "Usuário criado com sucesso!",

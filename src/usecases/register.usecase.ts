@@ -30,3 +30,26 @@ export const registerUseCase = async (
   }
   return user;
 };
+
+export class RegisterUseCase {
+  async execute(data: registerUseCaseInput): Promise<Omit<User, "password">> {
+    const hashPassword = await getHash(data.password);
+
+    if (!hashPassword) {
+      throw new Error("Hash não fornecido");
+    }
+
+    const user = await prisma.user.create({
+      data: {
+        email: data.email,
+        name: data.name,
+        password: hashPassword,
+      },
+    });
+
+    if (!user) {
+      throw new Error("Ocorreu um erro ao criar um usuário");
+    }
+    return user;
+  }
+}
