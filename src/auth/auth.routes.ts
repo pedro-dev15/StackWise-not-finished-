@@ -9,5 +9,6 @@ router.post("/login", user.login);
 router.post("/register", user.register);
 router.get("/profile", authMiddleware, user.profile);
 router.post("/refresh", user.refresh);
+router.post("/logout", user.logout);
 
 export default router;

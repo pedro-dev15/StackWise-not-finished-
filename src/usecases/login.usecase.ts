@@ -1,4 +1,5 @@
-import { compareHash, getHash } from "../infra/crypto/bcrypt.auth";
+import { compareHash } from "../infra/crypto/bcrypt.auth";
+import { getCrypto } from "../infra/crypto/crypto.auth";
 import {
   generateAcessToken,
   generateRefreshToken,
@@ -33,7 +34,7 @@ export class LoginUseCase {
     });
 
     const refreshToken = generateRefreshToken(temp.id);
-    const refreshTokenHash = await getHash(refreshToken);
+    const refreshTokenHash = getCrypto(refreshToken);
 
     await prisma.refreshToken.update({
       where: {

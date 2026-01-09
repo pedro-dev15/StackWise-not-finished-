@@ -4,7 +4,8 @@ import {
   generateAcessToken,
   verifyRefreshToken,
 } from "../infra/token/auth.token";
-import { getHash, compareHash } from "../infra/crypto/bcrypt.auth";
+import { compareHash } from "../infra/crypto/bcrypt.auth";
+import { getCrypto } from "../infra/crypto/crypto.auth";
 
 export class RefreshTokenUseCase {
   async execute(oldToken: string) {
@@ -27,11 +28,6 @@ export class RefreshTokenUseCase {
         throw new Error("Refresh token inválido");
       }
 
-      const isValid = await compareHash(oldToken, storedToken.tokenHash);
-      if (!isValid) {
-        throw new Error("Refresh token inválido");
-      }
-
       await tx.refreshToken.update({
         where: { id: storedToken.id },
         data: { revoked: true },
@@ -48,7 +44,7 @@ export class RefreshTokenUseCase {
       });
 
       const newRefreshToken = generateRefreshToken(temp.id);
-      const newRefreshTokenHash = await getHash(newRefreshToken);
+      const newRefreshTokenHash = getCrypto(newRefreshToken);
 
       await tx.refreshToken.update({
         where: {

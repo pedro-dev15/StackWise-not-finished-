@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import { RegisterUseCase } from "../usecases/register.usecase";
 import { LoginUseCase } from "../usecases/login.usecase";
 import { RefreshTokenUseCase } from "../usecases/refresh-token.usecase";
+import { LogoutUseCase } from "../usecases/logout.usecase";
 
 export const none: RequestHandler = (req, res) => {
   res.send("Hello, the api is running!");
@@ -81,6 +82,30 @@ export const refresh: RequestHandler = async (req, res) => {
       .status(201)
       .json({ accessToken: tokens.newAccessToken });
   } catch (err) {
-    res.status(401).json({ error: "Refresh token inválido", err });
+    res
+      .status(401)
+      .json({
+        error: "Refresh token inválido",
+        err: err instanceof Error ? err.message : err,
+      });
+  }
+};
+
+export const logout: RequestHandler = async (req, res) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(200).json({ error: "Refresh token ausente" });
+    }
+
+    const useCase = new LogoutUseCase();
+    await useCase.execute(refreshToken);
+
+    res
+      .clearCookie("refreshToken", { httpOnly: true, sameSite: "strict" })
+      .status(200)
+      .json({ message: "Logout feito com sucesso" });
+  } catch (err) {
+    res.status(500).json({ error: "Erro ao efetuar logout" });
   }
 };
