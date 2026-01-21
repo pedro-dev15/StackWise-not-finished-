@@ -2,13 +2,13 @@ import { Router } from "express";
 import * as user from "./auth.controller";
 import { authMiddleware } from "../middleware/auth.middleware";
 
-const router = Router();
+const authRouter = Router();
 
-router.get("/", user.none);
-router.post("/login", user.login);
-router.post("/register", user.register);
-router.get("/profile", authMiddleware, user.profile);
-router.post("/refresh", user.refresh);
-router.post("/logout", user.logout);
+authRouter.get("/", user.none);
+authRouter.post("/login", user.login);
+authRouter.post("/register", user.register);
+authRouter.get("/profile", authMiddleware, user.profile);
+authRouter.post("/refresh", user.refresh);
+authRouter.post("/logout", user.logout);
 
-export default router;
+export default authRouter;

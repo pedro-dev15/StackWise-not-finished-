@@ -7,6 +7,13 @@ datasource db {
   provider = "postgresql"
 }
 
+enum TaskStatus {
+  PENDING
+  EXPIRED
+  COMPLETED
+  OVERDUE
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -15,6 +22,7 @@ model User {
   createdAt DateTime @default(now())
 
   refreshTokens RefreshToken[]
+  tasks Task[]
 }
 
 model RefreshToken {
@@ -26,4 +34,22 @@ model RefreshToken {
   revoked   Boolean  @default(false)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Task {
+  id String @id @default(uuid())
+  title String 
+  description String?
+  status TaskStatus @default(PENDING)
+
+  dueDate DateTime?
+  completedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, status])
 }
