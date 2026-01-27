@@ -3,5 +3,11 @@ export interface TaskForCreating {
   description?: string;
   dueDate?: Date;
   completedAt?: Date;
-  userId: string;
+}
+
+export interface TaskForUpdating {
+  id: string;
+  title: string;
+  description?: string;
+  dueDate?: Date;
 }

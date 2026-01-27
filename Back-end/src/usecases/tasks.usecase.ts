@@ -1,25 +1,16 @@
 import { prisma } from "../lib/prisma";
-import { TaskForCreating } from "../types/tasks";
+import { TaskForCreating, TaskForUpdating } from "../types/tasks";
 
-export class addTaskUseCase {
-  async execute(body: TaskForCreating) {
+export class AddTaskUseCase {
+  async execute(userId: string, body: TaskForCreating) {
     if (!body) throw new Error("Body não fornecido");
-
-    const userExists = await prisma.user.findUnique({
-      where: {
-        id: body.userId,
-      },
-    });
-
-    if (!userExists) throw new Error("User doesn't exists");
 
     const task = await prisma.task.create({
       data: {
         title: body.title,
         description: body.description,
         dueDate: body.dueDate,
-        completedAt: body.completedAt,
-        userId: body.userId,
+        userId,
       },
     });
 
@@ -31,16 +22,59 @@ export class addTaskUseCase {
   }
 }
 
-export class getAllTasksUseCase {
+export class GetAllTasksUseCase {
   async execute(userId: string) {
-    if (!userId) throw new Error("UserId não fornecido!");
-
     return await prisma.task.findMany({
       where: {
         userId,
       },
       orderBy: {
         createdAt: "desc",
+      },
+    });
+  }
+}
+
+export class UpdateTaskUseCase {
+  async execute(userId: string, body: TaskForUpdating) {
+    const taskExists = await prisma.task.findFirst({
+      where: {
+        id: body.id,
+        userId,
+      },
+    });
+
+    if (!taskExists) throw new Error("Id de task inválido");
+
+    const updatedTask = await prisma.task.update({
+      where: {
+        id: body.id,
+      },
+      data: {
+        title: body.title,
+        description: body.description,
+        dueDate: body.dueDate ? new Date(body.dueDate) : undefined,
+      },
+    });
+
+    return updatedTask;
+  }
+}
+
+export class DeleteTaskUseCase {
+  async execute(userId: string, taskId: string) {
+    const taskExists = await prisma.task.findFirst({
+      where: {
+        id: taskId,
+        userId,
+      },
+    });
+
+    if (!taskExists) throw new Error("Id de task inválido");
+
+    await prisma.task.delete({
+      where: {
+        id: taskId,
       },
     });
   }

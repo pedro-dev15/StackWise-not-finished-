@@ -16,6 +16,14 @@ export class RegisterUseCase {
       throw new Error("Hash não fornecido");
     }
 
+    const userExists = await prisma.user.findUnique({
+      where: { email: data.email },
+    });
+
+    if (userExists) {
+      throw new Error("Usuário já existe");
+    }
+
     const user = await prisma.user.create({
       data: {
         email: data.email,
