@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import {
   AddTaskUseCase,
+  CompleteTaskUseCase,
   DeleteTaskUseCase,
   GetAllTasksUseCase,
   UpdateTaskUseCase,
@@ -58,9 +59,10 @@ export const updateTask: RequestHandler = async (req, res) => {
     }
 
     const body = req.body;
+    const { id } = req.params;
 
     const useCase = new UpdateTaskUseCase();
-    const newTask = await useCase.execute(user.id, body);
+    const newTask = await useCase.execute(user.id, body, id);
 
     res.status(200).json({ message: "Task alterada com sucesso", newTask });
   } catch (err) {
@@ -80,7 +82,7 @@ export const deleteTask: RequestHandler = async (req, res) => {
       return res.status(401).json({ error: "NÃ£o autorizado" });
     }
 
-    const { id } = req.body;
+    const { id } = req.params;
 
     const usecase = new DeleteTaskUseCase();
     await usecase.execute(user.id, id);
@@ -90,6 +92,29 @@ export const deleteTask: RequestHandler = async (req, res) => {
     console.log("Erro ao deletar uma task");
     res.status(400).json({
       message: "Failed deleting task",
+      error: err instanceof Error ? err.message : err,
+    });
+  }
+};
+
+export const completeTask: RequestHandler = async (req, res) => {
+  try {
+    const user = req.user;
+
+    if (!user) {
+      return res.status(401).json({ error: "NÃ£o autorizado" });
+    }
+
+    const { id } = req.params;
+
+    const useCase = new CompleteTaskUseCase();
+    const newTask = await useCase.execute(user.id, id);
+
+    res.status(200).json({ message: "Tarefa concluida com sucesso!", newTask });
+  } catch (err) {
+    console.log("Erro ao completar uma task");
+    res.status(400).json({
+      message: "Failed finishing task",
       error: err instanceof Error ? err.message : err,
     });
   }

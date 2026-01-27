@@ -8,5 +8,6 @@ tasksRouter.post("/addTask/", authMiddleware, Task.addTask);
 tasksRouter.get("/getTasks/", authMiddleware, Task.getAllTasks);
 tasksRouter.put("/updateTask/", authMiddleware, Task.updateTask);
 tasksRouter.delete("/deleteTask/", authMiddleware, Task.deleteTask);
+tasksRouter.put("/completeTask/:id", authMiddleware, Task.completeTask);
 
 export default tasksRouter;

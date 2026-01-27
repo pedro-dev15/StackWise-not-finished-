@@ -3,13 +3,12 @@ import { TaskForCreating, TaskForUpdating } from "../types/tasks";
 
 export class AddTaskUseCase {
   async execute(userId: string, body: TaskForCreating) {
-    if (!body) throw new Error("Body não fornecido");
-
+    if (!body.title?.trim) throw new Error("Título necessário");
     const task = await prisma.task.create({
       data: {
         title: body.title,
         description: body.description,
-        dueDate: body.dueDate,
+        dueDate: body.dueDate ? new Date(body.dueDate) : undefined,
         userId,
       },
     });
@@ -36,24 +35,30 @@ export class GetAllTasksUseCase {
 }
 
 export class UpdateTaskUseCase {
-  async execute(userId: string, body: TaskForUpdating) {
-    const taskExists = await prisma.task.findFirst({
+  async execute(userId: string, body: TaskForUpdating, id: string) {
+    const taskExists = await prisma.task.findUnique({
       where: {
-        id: body.id,
-        userId,
+        id,
       },
     });
 
     if (!taskExists) throw new Error("Id de task inválido");
 
+    if (taskExists.userId !== userId) throw new Error("Sem permissão");
+
     const updatedTask = await prisma.task.update({
       where: {
-        id: body.id,
+        id: id,
       },
       data: {
-        title: body.title,
-        description: body.description,
-        dueDate: body.dueDate ? new Date(body.dueDate) : undefined,
+        title: body.title ?? taskExists.title,
+        description: body.description ?? taskExists.description,
+        dueDate:
+          body.dueDate !== undefined
+            ? body.dueDate === null
+              ? null
+              : new Date(body.dueDate)
+            : taskExists.dueDate,
       },
     });
 
@@ -63,18 +68,53 @@ export class UpdateTaskUseCase {
 
 export class DeleteTaskUseCase {
   async execute(userId: string, taskId: string) {
-    const taskExists = await prisma.task.findFirst({
+    const taskExists = await prisma.task.findUnique({
       where: {
         id: taskId,
-        userId,
       },
     });
 
     if (!taskExists) throw new Error("Id de task inválido");
 
-    await prisma.task.delete({
+    if (taskExists.userId !== userId) throw new Error("Sem permissão");
+
+    return await prisma.task.delete({
       where: {
         id: taskId,
+      },
+    });
+  }
+}
+
+export class CompleteTaskUseCase {
+  async execute(userId: string, taskId: string) {
+    const taskExists = await prisma.task.findUnique({
+      where: {
+        id: taskId,
+      },
+    });
+
+    if (!taskExists) throw new Error("Id de task inválido");
+
+    if (taskExists.userId !== userId) throw new Error("Sem permissão");
+
+    if (taskExists.status !== "PENDING" && taskExists.status !== "EXPIRED") {
+      throw new Error("Task não pode ser concluída");
+    }
+
+    const now = new Date();
+
+    const isOverdue =
+      taskExists.status === "EXPIRED" ||
+      (taskExists.dueDate && taskExists.dueDate < now);
+
+    const status = isOverdue ? "OVERDUE" : "COMPLETED";
+
+    return prisma.task.update({
+      where: { id: taskId },
+      data: {
+        completedAt: now,
+        status,
       },
     });
   }

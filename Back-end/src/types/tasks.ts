@@ -6,7 +6,6 @@ export interface TaskForCreating {
 }
 
 export interface TaskForUpdating {
-  id: string;
   title: string;
   description?: string;
   dueDate?: Date;
