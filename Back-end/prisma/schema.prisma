@@ -14,6 +14,12 @@ enum TaskStatus {
   OVERDUE
 }
 
+enum FrequencyType {
+  DAILY
+  WEEKLY
+  CUSTOM
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -22,7 +28,8 @@ model User {
   createdAt DateTime @default(now())
 
   refreshTokens RefreshToken[]
-  tasks Task[]
+  tasks         Task[]
+  habits        Habit[]
 }
 
 model RefreshToken {
@@ -37,19 +44,71 @@ model RefreshToken {
 }
 
 model Task {
-  id String @id @default(uuid())
-  title String 
+  id          String      @id @default(uuid())
+  title       String
   description String?
-  status TaskStatus @default(PENDING)
+  status      TaskStatus @default(PENDING)
 
-  dueDate DateTime?
+  dueDate     DateTime?
   completedAt DateTime?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   userId String
-  user User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, status])
+}
+
+model Habit {
+  id          String        @id @default(uuid())
+  title       String
+  description String?
+
+  frequency   FrequencyType
+
+  // OBRIGATÓRIO para CUSTOM - QUANTO É ESPERADO => REGRA
+  // 0 (domingo) → 6 (sábado)
+  daysOfWeek  Int[]
+
+  // precisão temporal
+  // ex: "America/Sao_Paulo"
+  timezone    String
+
+  // sempre UTC
+  startDate   DateTime      @default(now())
+
+  // QUANTO BASTA
+  target      Int?
+
+  isActive    Boolean       @default(true)
+
+  // UTC
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  records HabitRecord[]
+
+  @@index([userId])
+}
+
+model HabitRecord {
+  id        String   @id @default(uuid())
+
+  // Tem que ser UTC no db
+  // Deve ser normalizado no UseCase (00:00 UTC)
+  date      DateTime
+
+  // UTC
+  createdAt DateTime @default(now())
+
+  habitId String
+  habit   Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
+  @@unique([habitId, date])
+  @@index([habitId])
 }
