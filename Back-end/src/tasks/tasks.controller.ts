@@ -6,6 +6,7 @@ import {
   GetAllTasksUseCase,
   UpdateTaskUseCase,
 } from "../usecases/tasks.usecase";
+import { AppError } from "../errors/AppError";
 
 export const addTask: RequestHandler = async (req, res) => {
   try {
@@ -21,10 +22,15 @@ export const addTask: RequestHandler = async (req, res) => {
 
     res.status(201).json({ message: "Task criada com sucesso!", task });
   } catch (err) {
-    console.log("Erro ao adicionar nova task");
-    res.status(400).json({
-      message: "Failed adding new task",
-      error: err instanceof Error ? err.message : err,
+    if (err instanceof AppError) {
+      return res.status(err.statusCode).json({
+        message: err.message,
+      });
+    }
+
+    console.error("Erro ao adicionar task", err);
+    return res.status(500).json({
+      message: "Erro interno",
     });
   }
 };
@@ -42,10 +48,15 @@ export const getAllTasks: RequestHandler = async (req, res) => {
 
     res.status(200).json({ tasks });
   } catch (err) {
-    console.log("Erro ao pegar tasks");
-    res.status(400).json({
-      message: "Failed getting tasks",
-      error: err instanceof Error ? err.message : err,
+    if (err instanceof AppError) {
+      return res.status(err.statusCode).json({
+        message: err.message,
+      });
+    }
+
+    console.error("Erro ao pegar tasks", err);
+    return res.status(500).json({
+      message: "Erro interno",
     });
   }
 };
@@ -66,10 +77,15 @@ export const updateTask: RequestHandler = async (req, res) => {
 
     res.status(200).json({ message: "Task alterada com sucesso", newTask });
   } catch (err) {
-    console.log("Erro ao fazer update em uma task");
-    res.status(400).json({
-      message: "Failed updating task",
-      error: err instanceof Error ? err.message : err,
+    if (err instanceof AppError) {
+      return res.status(err.statusCode).json({
+        message: err.message,
+      });
+    }
+
+    console.error("Erro ao atualizar task", err);
+    return res.status(500).json({
+      message: "Erro interno",
     });
   }
 };
@@ -87,12 +103,17 @@ export const deleteTask: RequestHandler = async (req, res) => {
     const usecase = new DeleteTaskUseCase();
     await usecase.execute(user.id, id);
 
-    res.status(200).json({ message: "Task deletada com sucesso", id });
+    res.status(204).json({ message: "Task deletada com sucesso", id });
   } catch (err) {
-    console.log("Erro ao deletar uma task");
-    res.status(400).json({
-      message: "Failed deleting task",
-      error: err instanceof Error ? err.message : err,
+    if (err instanceof AppError) {
+      return res.status(err.statusCode).json({
+        message: err.message,
+      });
+    }
+
+    console.error("Erro ao deletar task", err);
+    return res.status(500).json({
+      message: "Erro interno",
     });
   }
 };
@@ -112,10 +133,15 @@ export const completeTask: RequestHandler = async (req, res) => {
 
     res.status(200).json({ message: "Tarefa concluida com sucesso!", newTask });
   } catch (err) {
-    console.log("Erro ao completar uma task");
-    res.status(400).json({
-      message: "Failed finishing task",
-      error: err instanceof Error ? err.message : err,
+    if (err instanceof AppError) {
+      return res.status(err.statusCode).json({
+        message: err.message,
+      });
+    }
+
+    console.error("Erro ao completar task", err);
+    return res.status(500).json({
+      message: "Erro interno",
     });
   }
 };

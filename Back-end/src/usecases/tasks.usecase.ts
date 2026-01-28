@@ -1,10 +1,14 @@
+import { AppError } from "../errors/AppError";
+import { ConflictError } from "../errors/ConflictError";
+import { ForbiddenError } from "../errors/ForbiddenError";
+import { NotFoundError } from "../errors/NotFoundError";
 import { prisma } from "../lib/prisma";
 import { TaskForCreating, TaskForUpdating } from "../types/tasks";
 
 export class AddTaskUseCase {
   async execute(userId: string, body: TaskForCreating) {
-    if (!body.title?.trim) throw new Error("Título necessário");
-    const task = await prisma.task.create({
+    if (!body.title?.trim()) throw new AppError("Título necessário");
+    return prisma.task.create({
       data: {
         title: body.title,
         description: body.description,
@@ -12,18 +16,12 @@ export class AddTaskUseCase {
         userId,
       },
     });
-
-    if (!task) {
-      throw new Error("Erro ao criar nova task");
-    }
-
-    return task;
   }
 }
 
 export class GetAllTasksUseCase {
   async execute(userId: string) {
-    return await prisma.task.findMany({
+    return prisma.task.findMany({
       where: {
         userId,
       },
@@ -42,11 +40,11 @@ export class UpdateTaskUseCase {
       },
     });
 
-    if (!taskExists) throw new Error("Id de task inválido");
+    if (!taskExists) throw new NotFoundError("Task não encontrada");
 
-    if (taskExists.userId !== userId) throw new Error("Sem permissão");
+    if (taskExists.userId !== userId) throw new ForbiddenError();
 
-    const updatedTask = await prisma.task.update({
+    return prisma.task.update({
       where: {
         id: id,
       },
@@ -61,8 +59,6 @@ export class UpdateTaskUseCase {
             : taskExists.dueDate,
       },
     });
-
-    return updatedTask;
   }
 }
 
@@ -74,11 +70,11 @@ export class DeleteTaskUseCase {
       },
     });
 
-    if (!taskExists) throw new Error("Id de task inválido");
+    if (!taskExists) throw new NotFoundError("Task não encontrada");
 
-    if (taskExists.userId !== userId) throw new Error("Sem permissão");
+    if (taskExists.userId !== userId) throw new ForbiddenError();
 
-    return await prisma.task.delete({
+    return prisma.task.delete({
       where: {
         id: taskId,
       },
@@ -94,12 +90,12 @@ export class CompleteTaskUseCase {
       },
     });
 
-    if (!taskExists) throw new Error("Id de task inválido");
+    if (!taskExists) throw new NotFoundError("Task não encontrada");
 
-    if (taskExists.userId !== userId) throw new Error("Sem permissão");
+    if (taskExists.userId !== userId) throw new ForbiddenError();
 
     if (taskExists.status !== "PENDING" && taskExists.status !== "EXPIRED") {
-      throw new Error("Task não pode ser concluída");
+      throw new ConflictError("Task não pode ser concluída");
     }
 
     const now = new Date();

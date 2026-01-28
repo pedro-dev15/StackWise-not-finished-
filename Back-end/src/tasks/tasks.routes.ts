@@ -4,10 +4,14 @@ import { authMiddleware } from "../middleware/auth.middleware";
 
 const tasksRouter = Router();
 
-tasksRouter.post("/addTask/", authMiddleware, Task.addTask);
-tasksRouter.get("/getTasks/", authMiddleware, Task.getAllTasks);
-tasksRouter.put("/updateTask/", authMiddleware, Task.updateTask);
-tasksRouter.delete("/deleteTask/", authMiddleware, Task.deleteTask);
-tasksRouter.put("/completeTask/:id", authMiddleware, Task.completeTask);
+tasksRouter.post("/", authMiddleware, Task.addTask);
+
+tasksRouter.get("/", authMiddleware, Task.getAllTasks);
+
+tasksRouter.put("/:id", authMiddleware, Task.updateTask);
+
+tasksRouter.delete("/:id", authMiddleware, Task.deleteTask);
+
+tasksRouter.patch("/:id/complete", authMiddleware, Task.completeTask);
 
 export default tasksRouter;
