@@ -144,4 +144,5 @@ cp .env.example .env
 ```bash
 npm run dev
 ```
-## Colaboradores - **Pedro Da Cunha** – Desenvolvedor principal <br></br> [![Pedro Da Cunha](https://github.com/pedro-dev15.png?size=100)](https://github.com/pedro-dev15)
+## Colaboradores
+- **Pedro Da Cunha** – Desenvolvedor principal <br></br> [![Pedro Da Cunha](https://github.com/pedro-dev15.png?size=100)](https://github.com/pedro-dev15)
