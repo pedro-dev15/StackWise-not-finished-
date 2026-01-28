@@ -14,4 +14,6 @@ tasksRouter.delete("/:id", authMiddleware, Task.deleteTask);
 
 tasksRouter.patch("/:id/complete", authMiddleware, Task.completeTask);
 
+tasksRouter.patch("/:id/uncomplete", authMiddleware, Task.completeTask);
+
 export default tasksRouter;
