@@ -1,9 +1,9 @@
-import { AppError } from "../errors/AppError";
-import { ConflictError } from "../errors/ConflictError";
-import { ForbiddenError } from "../errors/ForbiddenError";
-import { NotFoundError } from "../errors/NotFoundError";
-import { prisma } from "../lib/prisma";
-import { TaskForCreating, TaskForUpdating } from "../types/tasks";
+import { AppError } from "../../shared/errors/AppError";
+import { ConflictError } from "../../shared/errors/ConflictError";
+import { ForbiddenError } from "../../shared/errors/ForbiddenError";
+import { NotFoundError } from "../../shared/errors/NotFoundError";
+import { prisma } from "../../lib/prisma";
+import { TaskForCreating, TaskForUpdating } from "../../types/tasks";
 
 export class AddTaskUseCase {
   async execute(userId: string, body: TaskForCreating) {

@@ -1,9 +1,11 @@
 import { RequestHandler } from "express";
-import { AppError } from "../errors/AppError";
+import { AppError } from "../shared/errors/AppError";
 import {
   AdicionarHabitoUseCase,
+  ApagarHabitoUseCase,
+  AtualizarHabitoUseCase,
   PegarHabitosUseCase,
-} from "../usecases/habits.usecase";
+} from "../usecases/habitUseCases/habits.usecase";
 
 export const adicionarHabito: RequestHandler = async (req, res) => {
   try {
@@ -51,6 +53,66 @@ export const pegarHabitos: RequestHandler = async (req, res) => {
     }
 
     console.error("Erro ao pegar hábitos", err);
+    return res.status(500).json({
+      message: "Erro interno",
+    });
+  }
+};
+
+export const atualizarHabito: RequestHandler = async (req, res) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      return res.status(401).json({ error: "NÃ£o autorizado" });
+    }
+
+    const { id } = req.params;
+    const body = req.body;
+
+    const usecase = new AtualizarHabitoUseCase();
+    const newHabit = await usecase.execute(body, user.id, id);
+
+    res.status(200).json({ message: "Hábito alterado com sucesso", newHabit });
+    if (!user) {
+      return res.status(401).json({ error: "NÃ£o autorizado" });
+    }
+  } catch (err) {
+    if (err instanceof AppError) {
+      return res.status(err.statusCode).json({
+        message: err.message,
+      });
+    }
+
+    console.error("Erro ao atualizar hábito", err);
+    return res.status(500).json({
+      message: "Erro interno",
+    });
+  }
+};
+
+export const apagarHabito: RequestHandler = async (req, res) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      return res.status(401).json({ error: "NÃ£o autorizado" });
+    }
+
+    const { id } = req.params;
+    const usecase = new ApagarHabitoUseCase();
+    const newHabit = await usecase.execute(user.id, id);
+
+    res.status(200).json({ message: "Hábito alterado com sucesso", newHabit });
+    if (!user) {
+      return res.status(401).json({ error: "NÃ£o autorizado" });
+    }
+  } catch (err) {
+    if (err instanceof AppError) {
+      return res.status(err.statusCode).json({
+        message: err.message,
+      });
+    }
+
+    console.error("Erro ao apagar hábito", err);
     return res.status(500).json({
       message: "Erro interno",
     });

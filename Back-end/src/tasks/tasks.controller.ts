@@ -6,8 +6,8 @@ import {
   GetAllTasksUseCase,
   UncompleteTaskUseCase,
   UpdateTaskUseCase,
-} from "../usecases/tasks.usecase";
-import { AppError } from "../errors/AppError";
+} from "../usecases/taskUseCases/tasks.usecase";
+import { AppError } from "../shared/errors/AppError";
 
 export const addTask: RequestHandler = async (req, res) => {
   try {
