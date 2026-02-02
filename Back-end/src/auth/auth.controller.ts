@@ -3,10 +3,6 @@ import { RegisterUseCase } from "../usecases/authUsecases/register.usecase";
 import { LoginUseCase } from "../usecases/authUsecases/login.usecase";
 import { RefreshTokenUseCase } from "../usecases/authUsecases/refresh-token.usecase";
 import { LogoutUseCase } from "../usecases/authUsecases/logout.usecase";
-import { DeleteTaskUseCase } from "../usecases/taskUseCases/tasks.usecase";
-import { DeleteUserUseCase } from "../usecases/authUsecases/deleteUser.usecase";
-import { getAllUsersUseCase } from "../usecases/authUsecases/getAllUsers.usecase";
-import { getOneUserUseCase } from "../usecases/authUsecases/getOneUser.usecase";
 
 export const none: RequestHandler = (req, res) => {
   res.send("Hello, the api is running!");
@@ -109,45 +105,5 @@ export const logout: RequestHandler = async (req, res) => {
       .json({ message: "Logout feito com sucesso" });
   } catch (err) {
     res.status(500).json({ error: "Erro ao efetuar logout" });
-  }
-};
-
-//admin routes
-export const deleteUser: RequestHandler = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const useCase = new DeleteUserUseCase();
-    const deletedUser = await useCase.execute(id);
-
-    res
-      .status(200)
-      .json({ message: "Usúario deletado com sucesso!", deletedUser });
-  } catch (err) {
-    res.status(500).json({ error: "Erro ao deletar usuário" });
-  }
-};
-
-export const getAllUsers: RequestHandler = async (req, res) => {
-  try {
-    const useCase = new getAllUsersUseCase();
-    const users = await useCase.execute();
-
-    res.status(200).json({ users });
-  } catch (err) {
-    res.status(500).json({ error: "Erro ao pegar usuários" });
-  }
-};
-
-export const getOneUser: RequestHandler = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const useCase = new getOneUserUseCase();
-    const users = await useCase.execute(id);
-
-    res.status(200).json({ users });
-  } catch (err) {
-    res.status(500).json({ error: "Erro ao pegar usuários" });
   }
 };
