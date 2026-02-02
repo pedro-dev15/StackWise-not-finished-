@@ -98,10 +98,11 @@ export const apagarHabito: RequestHandler = async (req, res) => {
     }
 
     const { id } = req.params;
-    const usecase = new ApagarHabitoUseCase();
-    const newHabit = await usecase.execute(user.id, id);
 
-    res.status(200).json({ message: "Hábito alterado com sucesso", newHabit });
+    const usecase = new ApagarHabitoUseCase();
+    const Habit = await usecase.execute(user.id, id);
+
+    res.status(200).json({ message: "Hábito deletado com sucesso", Habit });
     if (!user) {
       return res.status(401).json({ error: "NÃ£o autorizado" });
     }

@@ -44,7 +44,7 @@ export class PegarHabitosUseCase {
 
 export class AtualizarHabitoUseCase {
   async execute(body: HabitForCreating, userId: string, id: string) {
-    const habitExists = await prisma.task.findUnique({
+    const habitExists = await prisma.habit.findUnique({
       where: {
         id,
       },
@@ -78,7 +78,7 @@ export class AtualizarHabitoUseCase {
 
 export class ApagarHabitoUseCase {
   async execute(userId: string, id: string) {
-    const habitExists = await prisma.task.findUnique({
+    const habitExists = await prisma.habit.findUnique({
       where: {
         id,
       },
@@ -88,7 +88,7 @@ export class ApagarHabitoUseCase {
 
     if (habitExists.userId !== userId) throw new ForbiddenError();
 
-    return prisma.task.delete({
+    return prisma.habit.delete({
       where: {
         id,
       },
