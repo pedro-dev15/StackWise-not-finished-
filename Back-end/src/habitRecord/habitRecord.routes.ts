@@ -4,6 +4,10 @@ import { authMiddleware } from "../middleware/auth.middleware";
 
 const habitRecordRouter = Router();
 
-habitRecordRouter.post("/", authMiddleware, habitRecord.marcarHabitoConcluido);
+habitRecordRouter.post(
+  "/:habitId/records",
+  authMiddleware,
+  habitRecord.checkIn,
+);
 
 export default habitRecordRouter;

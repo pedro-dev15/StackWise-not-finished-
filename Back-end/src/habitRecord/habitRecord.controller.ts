@@ -1,6 +1,6 @@
 import { AppError } from "../shared/errors/AppError";
 import { RequestHandler } from "express";
-export const marcarHabitoConcluido: RequestHandler = async (req, res) => {
+export const checkIn: RequestHandler = async (req, res) => {
   try {
   } catch (err) {
     if (err instanceof AppError) {
@@ -9,7 +9,7 @@ export const marcarHabitoConcluido: RequestHandler = async (req, res) => {
       });
     }
 
-    console.error("Erro ao marcar hábito como completo", err);
+    console.error("Erro ao marcar checkIn", err);
     return res.status(500).json({
       message: "Erro interno",
     });
