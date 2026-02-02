@@ -7,6 +7,11 @@ datasource db {
   provider = "postgresql"
 }
 
+enum UserRoles {
+  USER
+  ADMIN
+}
+
 enum TaskStatus {
   PENDING
   EXPIRED
@@ -25,6 +30,9 @@ model User {
   email     String   @unique
   name      String
   password  String
+
+  role      UserRoles @default(USER)
+   
   createdAt DateTime @default(now())
 
   refreshTokens RefreshToken[]

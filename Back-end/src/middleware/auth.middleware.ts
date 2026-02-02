@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import { verifyAcessToken } from "../infra/token/auth.token";
 import { prisma } from "../lib/prisma";
+import { triggerAsyncId } from "node:async_hooks";
 
 export const authMiddleware: RequestHandler = async (req, res, next) => {
   const header = req.headers["authorization"];
@@ -30,6 +31,7 @@ export const authMiddleware: RequestHandler = async (req, res, next) => {
         id: true,
         name: true,
         email: true,
+        role: true,
         createdAt: true,
       },
     });
