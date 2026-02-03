@@ -4,15 +4,18 @@ import {
   generateAcessToken,
   verifyRefreshToken,
 } from "../../infra/token/auth.token";
-import { compareHash } from "../../infra/crypto/bcrypt.auth";
 import { getCrypto } from "../../infra/crypto/crypto.auth";
+import { AppError } from "../../shared/errors/AppError";
+import { NotFoundError } from "../../shared/errors/NotFoundError";
 
 export class RefreshTokenUseCase {
   async execute(oldToken: string) {
     const payload = verifyRefreshToken(oldToken);
 
+    const incomingHash = getCrypto(oldToken);
+
     if (!payload || payload.type !== "refresh") {
-      throw new Error("Token inválido");
+      throw new AppError("Token inválido");
     }
 
     return prisma.$transaction(async (tx) => {
@@ -23,23 +26,38 @@ export class RefreshTokenUseCase {
       if (
         !storedToken ||
         storedToken.revoked ||
-        storedToken.expiresAt < new Date()
+        storedToken.expiresAt < new Date() ||
+        storedToken.tokenHash !== incomingHash
       ) {
-        throw new Error("Refresh token inválido");
+        throw new AppError("Refresh token inválido");
       }
+
+      const user = await prisma.user.findUnique({
+        where: {
+          id: storedToken.userId,
+        },
+        select: {
+          role: true,
+          id: true,
+        },
+      });
+
+      if (!user) throw new NotFoundError();
 
       await tx.refreshToken.update({
         where: { id: storedToken.id },
         data: { revoked: true },
       });
 
-      const newAccessToken = generateAcessToken(storedToken.userId);
+      const newAccessToken = generateAcessToken(user.id, user.role);
+
+      const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7);
 
       const temp = await tx.refreshToken.create({
         data: {
           userId: storedToken.userId,
           tokenHash: "temp",
-          expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+          expiresAt,
         },
       });
 
