@@ -12,4 +12,8 @@ userRouter.get("/:id", authMiddleware, ensureAdmin, user.getOneUser);
 
 userRouter.delete("/:id", authMiddleware, ensureAdmin, user.deleteUser);
 
+userRouter.patch("/:id", authMiddleware, ensureAdmin, user.promoveUser);
+
+userRouter.patch("/:id", authMiddleware, ensureAdmin, user.demoteUser);
+
 export default userRouter;
