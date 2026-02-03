@@ -1,11 +1,9 @@
 import { RequestHandler } from "express";
 import { AppError } from "../shared/errors/AppError";
-import {
-  AdicionarHabitoUseCase,
-  ApagarHabitoUseCase,
-  AtualizarHabitoUseCase,
-  PegarHabitosUseCase,
-} from "../usecases/habitUseCases/habits.usecase";
+import { AdicionarHabitoUseCase } from "../usecases/habitUseCases/adicionarHabito.usecase";
+import { ApagarHabitoUseCase } from "../usecases/habitUseCases/apagarHabito.usecase";
+import { AtualizarHabitoUseCase } from "../usecases/habitUseCases/atualizarHabito.usecase";
+import { PegarHabitosUseCase } from "../usecases/habitUseCases/pegarHabitos.usecase";
 
 export const adicionarHabito: RequestHandler = async (req, res) => {
   try {

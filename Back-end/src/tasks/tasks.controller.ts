@@ -1,12 +1,10 @@
 import { RequestHandler } from "express";
-import {
-  AddTaskUseCase,
-  CompleteTaskUseCase,
-  DeleteTaskUseCase,
-  GetAllTasksUseCase,
-  UncompleteTaskUseCase,
-  UpdateTaskUseCase,
-} from "../usecases/taskUseCases/tasks.usecase";
+import { AddTaskUseCase } from "../usecases/taskUseCases/adicionarTask.usecase";
+import { GetAllTasksUseCase } from "../usecases/taskUseCases/pegarTasks.usecase";
+import { UpdateTaskUseCase } from "../usecases/taskUseCases/atualizarTask.usecase";
+import { DeleteTaskUseCase } from "../usecases/taskUseCases/deletarTask.usecase";
+import { CompleteTaskUseCase } from "../usecases/taskUseCases/completarTask.usecase";
+import { UncompleteTaskUseCase } from "../usecases/taskUseCases/incompletarTask.usecase";
 import { AppError } from "../shared/errors/AppError";
 
 export const addTask: RequestHandler = async (req, res) => {
