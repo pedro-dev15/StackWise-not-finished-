@@ -1,6 +1,7 @@
 import { getHash } from "../../infra/crypto/bcrypt.auth";
 import { prisma } from "../../lib/prisma";
 import { User } from "../../../generated/prisma/client";
+import { AppError } from "../../shared/errors/AppError";
 
 interface registerUseCaseInput {
   name: string;
@@ -13,7 +14,7 @@ export class RegisterUseCase {
     const hashPassword = await getHash(data.password);
 
     if (!hashPassword) {
-      throw new Error("Hash não fornecido");
+      throw new AppError("Hash não fornecido");
     }
 
     const userExists = await prisma.user.findUnique({
@@ -21,7 +22,7 @@ export class RegisterUseCase {
     });
 
     if (userExists) {
-      throw new Error("Usuário já existe");
+      throw new AppError("Usuário já existe");
     }
 
     const user = await prisma.user.create({
@@ -32,9 +33,6 @@ export class RegisterUseCase {
       },
     });
 
-    if (!user) {
-      throw new Error("Ocorreu um erro ao criar um usuário");
-    }
     return user;
   }
 }

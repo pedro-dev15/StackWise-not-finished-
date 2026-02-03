@@ -5,6 +5,7 @@ import {
   generateRefreshToken,
 } from "../../infra/token/auth.token";
 import { prisma } from "../../lib/prisma";
+import { AppError } from "../../shared/errors/AppError";
 
 export class LoginUseCase {
   async execute(email: string, password: string) {
@@ -15,15 +16,15 @@ export class LoginUseCase {
     });
 
     if (!user) {
-      throw new Error("Credenciais inválidas");
+      throw new AppError("Credenciais inválidas");
     }
 
     const isMatch = await compareHash(password, user.password);
     if (!isMatch) {
-      throw new Error("Credenciais inválidas");
+      throw new AppError("Credenciais inválidas");
     }
 
-    const accessToken = generateAcessToken(user.id);
+    const accessToken = generateAcessToken(user.id, user.role);
 
     const temp = await prisma.refreshToken.create({
       data: {
