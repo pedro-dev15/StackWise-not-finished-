@@ -1,4 +1,5 @@
-# 🧠 StackWise  
+# 🧠 StackWise
+
 ### API Back-end orientada a arquitetura, regras de domínio e semântica HTTP
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -11,6 +12,7 @@
 ## Índice
 
 - [Descrição](#descrição)
+- [Documentação](#documentação)
 - [Objetivo do Projeto](#objetivo-do-projeto)
 - [Conceitos Aplicados](#conceitos-aplicados)
 - [Arquitetura](#arquitetura)
@@ -28,7 +30,15 @@
 O projeto simula uma **API real**, indo além de CRUDs simples, priorizando **decisões arquiteturais**, **separação de responsabilidades** e **previsibilidade do sistema**.
 
 > ⚠️ Este projeto **não foca em front-end** e **não busca apenas funcionar**.  
-O objetivo principal é **design correto, clareza e evolução sustentável**.
+> O objetivo principal é **design correto, clareza e evolução sustentável**.
+
+---
+
+## Documentação
+
+O **StackWise** tem documentação de fácil entendimento com o **Swagger**.
+
+Disponível na rota **/docs** para visualização e sujeita a mudanças futuras.
 
 ---
 
@@ -65,7 +75,9 @@ StackWise **não busca atalhos** — busca **clareza e responsabilidade técnica
 A arquitetura segue um modelo em camadas bem definidas:
 
 ### 🌐 Controllers
+
 Responsáveis por:
+
 - Receber requisições HTTP
 - Validar entrada básica
 - Traduzir erros para status HTTP
@@ -76,7 +88,9 @@ Não contêm regras de negócio.
 ---
 
 ### 🧠 Use Cases
+
 Responsáveis por:
+
 - Implementar regras de domínio
 - Validar estados e transições
 - Garantir consistência do sistema
@@ -87,7 +101,9 @@ São o **coração do projeto**.
 ---
 
 ### 🗄️ Data Layer (Prisma)
+
 Responsável por:
+
 - Persistência de dados
 - Comunicação com o banco
 - Isolamento da infraestrutura
@@ -127,22 +143,30 @@ A API segue princípios claros:
 ## Como Executar
 
 1. **Clone o repositório**
+
 ```bash
 git clone <URL_DO_REPOSITORIO>
 cd stackwise
 ```
+
 2. **Instale as dependências:**
+
 ```bash
 npm install
 ```
+
 3. **Configure o ambiente**
+
 ```bash
 cp .env.example .env
 ```
 
 3. **Execute o projeto**
+
 ```bash
 npm run dev
 ```
+
 ## Colaboradores
+
 - **Pedro Da Cunha** – Desenvolvedor principal <br></br> [![Pedro Da Cunha](https://github.com/pedro-dev15.png?size=100)](https://github.com/pedro-dev15)
