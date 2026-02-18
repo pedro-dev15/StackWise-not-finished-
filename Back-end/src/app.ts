@@ -7,7 +7,12 @@ import habitsRouter from "./habits/habits.routes";
 import habitRecordRouter from "./habitRecord/habitRecord.routes";
 import userRouter from "./user/user.routes";
 
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./config/swagger";
+
 export const app = express();
+
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use(express.json());
 app.use(cookieParser());
